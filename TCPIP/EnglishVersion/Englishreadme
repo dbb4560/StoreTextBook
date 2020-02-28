@@ -1,4 +1,7 @@
 this is english, the new verison is 2nd-edition version
+
+
+TCPIP 第二版 错误勘误表 <https://www.cnblogs.com/lshs/p/6038917.html>
 P596：示意图中最后一条TCP消息，Seq=K+1，作者写成了Seq=K。
 
 P600：TCP同关示意图中最后一条TCP消息Seq=K+1，作者写成了Seq=K。
