@@ -1,1 +1,31 @@
 this is english, the new verison is 2nd-edition version
+P596：示意图中最后一条TCP消息，Seq=K+1，作者写成了Seq=K。
+
+P600：TCP同关示意图中最后一条TCP消息Seq=K+1，作者写成了Seq=K。
+
+P609：第二行应该为Timestamp Echo Reply。
+
+P650：tcp_retries1和tcp_retries2这两个参数控制的是重传总时间，而不是重传次数。这两个参数man page里面也错误的描述为控制重传次数了，网上的错误描述也很多。另外SYNACK的重传次数除了受到tcp_synack_retries影响外，还会受到SOCKET选项TCP_SYNCNT、TCP_DEFER_ACCEPT等的影响。
+
+P737：Tahoe是4.3版本的BSD发布的，慢启动和拥塞避免也是4.3版本的BSD发布的。作者都描述为4.2版本了。
+
+P768：在linux中关闭TCP连接的时候，rttvar、cwnd确实会保存到TCP metrics中，但是tcp建立连接时候并不会使用rttvar，而cwnd是拥塞窗口的最大值，并不是拥塞窗口，而且只有在lock情况才会使用到cwnd。
+
+P742：对于limited transmit，作者描述是每一对dup ACK发送一个unsent数据，协议描述的是对于收到的前两个dup ACK，每个dup ACK都可以触发一个unsent数据包的发送。实际上limited transmit可以扩展为对于收到的前(dupthresh-1)个dup ACK，每个dup ACK都可以触发unsent数据包的发送，这个对应linux中disorder状态。[RFC3042]
+
+P743：对于application-limited发送端，作者解释为发送端有数据需要发送，但是受限于底层协议或者计算机忙于处理其他任务而没有发出去，显然正好理解错了，协议中application-limited状态就是指发送端没有更多数据等待发送的场景。[RFC2861]
+
+P769：TFRC中发送端的速率公式给错了，参考RFC5348及论文<Modeling TCP Throughput:A Simple Model and its Empirical Validation>的section 2.2，实际的速率计算公式为：
+
+                                s
+   X_Bps = ----------------------------------------------------------
+           R*sqrt(2*b*p/3) + (t_RTO * (3*sqrt(3*b*p/8)*p*(1+32*p^2)))
+即书中公式[2]应该给分母添加一个括号。
+
+P775：在计算K的时候作者首先说β默认是0.2，然后按照β=0.8给出一组K、Wmax、C的示例参数，紧接着下一段又说CUBIC中β默认值为0.8。实际上β叫做multiplicative decrease factor，CUBIC中β默认值确实是0.2，但是在具体代码实现上一般使用一个beta变量保存(1-β)的值，因此beta=0.8。一般讨论代码实现的时候我们可以说beta为0.8，但是讨论协议或者论文中的拥塞控制的时候我们一般说β为0.2。所以作者这里举例给出的K、Wmax、C的参数也就有问题了。另外linux内核cubic实现上beta=0.7，β=0.3。另外作者前面介绍的rate halving相关内容，应该更新为PRR才和这里相匹配
+
+P776：Figure 16-20这个图右上角W(t)的公式中第一个系数应该为0.4。另外Wtcp的计算公式中β实际上又混为(1-β)的值了，我在ncsu cubic主页上看到过作者给出的那个公式，估计作者直接copy过来的。改为下面的计算公式更为合理。可以参考<CUBIC: A New TCP-Friendly High-Speed TCP Variant>，感兴趣的可以自己推导一下下面的这个公式
+
+
+
+P777：倒数第二行括号里面应该改为"up to 3, the value for β"，这段对于buffer的描述比较简略，看不懂的可以参考Vegas原始论文<TCP Vegas: End to End Congestion Avoidance on a Global Internet>的 Section III-B。
